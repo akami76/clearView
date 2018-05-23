@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Clear View DashBoard</title>
+<script type="text/javascript"
+	src="//cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
+<script type="text/javascript"
+	src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+<script type="text/javascript"
+	src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<link rel="stylesheet" href="/js/lib/jui/css/ui.min.css" />
+<link id="ui_theme" rel="stylesheet"
+	href="/js/lib/jui/css/ui-jennifer.min.css" />
+<link rel="stylesheet" href="/js/lib/jui/css/grid.min.css" />
+<link id="grid_theme" rel="stylesheet"
+	href="/js/lib/jui/css/grid-jennifer.min.css" />
+<script src="https://code.jquery.com/jquery-3.2.1.slim.js"
+	integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg="
+	crossorigin="anonymous"></script>
+<script src="/js/lib/jui/js/core.min.js"></script>
+<script src="/js/lib/jui/js/ui.min.js"></script>
+<script src="/js/lib/jui/js/grid.min.js"></script>
+<script src="/js/lib/jui/js/chart.min.js"></script>
+<link href="http://fonts.googleapis.com/css?family=Open+Sans"
+	rel="stylesheet" type="text/css">
+<link href="/js/gallery/admintool/index.css" rel="stylesheet"
+	type="text/css" />
+<link id="index_theme" href="/js/gallery/admintool/index-jennifer.css"
+	rel="stylesheet" type="text/css" />
+
+</head>
+<body class="jui">
+
+	<div class="header">
+		<div class="logo">
+			<i class="icon-menu"></i>
+		</div>
+		<div class="toolbar">
+			<span>Theme</span> <span> <select
+				onchange="changeTheme(this.value)">
+					<option value="jennifer">Jennifer</option>
+					<option value="dark">Dark</option>
+			</select>
+			</span> <span style="float: right"> Sample <i class="icon-check"></i>
+			</span>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="menu">
+			<div class="vmenu ">
+				<a class="active"><i class="icon-monitoring"></i> Dashboard</a>
+			</div>
+		</div>
+		<div class="content">
+			<div class="content-list">
+				<div class="dashboard-first">
+					<div class="col col-4">
+						<div class="card">
+							<div class="title">현재요청건수</div>
+							<div id="request" class="value">3,352</div>
+						</div>
+					</div>
+					<div class="col col-4">
+						<div class="card">
+							<div class="title">현재처리건수</div>
+							<div id="process" class="value">5,962</div>
+						</div>
+					</div>
+					<div class="col col-4">
+						<div class="card">
+							<div class="title">현재완료건수</div>
+							<div id="response" class="value">2,610</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="body">
+						<h2 class="title">Traffic View</h2>
+						<div class="view">
+							<div id="traffic_chart" style="height: 250px;"></div>
+						</div>
+
+						<div class="row view" style="height: 150px;">
+							<div class="col col-6">
+								<h2 class="title">CPU Share</h2>
+								<div class="view">
+									<div id="traffic_chart2" style="height: 250px;"></div>
+								</div>
+							</div>
+							<div class="col col-6">
+								<h2 class="title">Memory Share</h2>
+								<div class="view">
+									<div id="traffic_chart3" style="height: 250px;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+    var chart = jui.include("chart.builder");
+    var chart_builder = [];		//실시간 chart를 위한 builder
+    var elapse = null;				//처리시간
+    var memoryShare= 0;			//메모리 점유울
+    var cpuShare = 0;			//CPU 점유율
+    var reqCnt = 0;				//요청건수
+    var resCnt = 0;				//응답건수
+    var result = null;			//일자
+    var id = null;				//id
+    var delta = 180;			
+    function getData(count) {
+        var data = [];
+
+        for(var i = 0; i < count; i++) {
+            data[i] = {
+                value1: 0
+            };
+        }
+
+        return data;
+    }
+    jui.ready([ "chart.builder" ], function(builder) {
+        
+    	var data1 = [],
+    	data2 = getData(150),
+        data3 = getData(150);
+		
+        chart_builder[chart_builder.length] = builder("#traffic_chart", {
+            padding: { left: 60, right: 80, top: 50, bottom: 30 },
+            axis : {
+                x : {
+                    type : "date",
+                    domain : [ new Date() - 1000 * 60 * 5, new Date() ],
+                    interval : 1,				// 단위 시간에 대한 간격 설정
+                    realtime : "minutes",		// 단위 시간 설정
+                    format : "hh:mm",
+                    key : "time",
+                    line : 'solid'
+                },
+                y : {
+                    type : "range",
+                    step : 4,
+                    domain : [ 0, 180 ]
+                }
+            },
+            brush : {
+                type : "scatter",
+                target : [ "elapseTime"],
+                useEvent : true,
+                colors : function(target) {
+                    if(target.elapseTime > 30) {
+                        return "red";
+                    }
+
+                    return 1;
+                }
+            },
+            widget : {
+				type : "dragselect",
+				dataType : "list"
+			},
+            event : {
+				"dragselect.end" : function(data) {
+					alert(data.length);
+					console.log(data);
+				},
+				click : function(obj, e) {
+					alert("id :"+data1[obj.dataIndex].id+"\r"+obj.dataKey+":"+obj.data[obj.dataKey]+"\rtime:"+data1[obj.dataIndex].time);
+				}
+								
+			},
+            style: {
+                backgroundColor: "transparent"
+            },
+           
+            render : false
+        });
+
+        chart_builder[chart_builder.length] = builder("#traffic_chart2", {
+            padding: { left: 60, right: 80, top: 50, bottom: 30 },
+            axis : {
+                x : {
+                    type : "dateblock",
+                    domain : [ new Date() - 1000 * 60 * 5, "value2" ],
+                    interval : 1,				// 단위 시간에 대한 간격 설정
+                    realtime : "minutes",		// 단위 시간 설정
+                    format : "hh:mm"
+                },
+                y : {
+                    type : "range",
+                    domain : [ 0, 100 ]
+                }
+            },
+            brush : {
+                type : "line",
+                target : [ "cpu"],
+                clip : true,
+                axis : 0,
+                useEvent : false,
+                colors : function(target) {
+                    if(target.cpu > 30) {
+                        return "red";
+                    }
+
+                    return 1;
+                }
+            },
+            style: {
+                backgroundColor: "transparent"
+            },
+            render : false
+        });
+        chart_builder[chart_builder.length] = builder("#traffic_chart3", {
+            padding: { left: 60, right: 80, top: 50, bottom: 30 },
+            axis : {
+                x : {
+                    type : "dateblock",
+                    domain : [ new Date() - 1000 * 60 * 5, new Date() ],
+                    interval : 1,				// 단위 시간에 대한 간격 설정
+                    realtime : "minutes",		// 단위 시간 설정
+                    format : "hh:mm"
+                },
+                y : {
+                    type : "range",
+                    domain : [ 0, 100 ]
+                }
+            },
+            brush : {
+                type : "line",
+                target : [ "memory"],
+                useEvent : false,
+                colors : function(target) {
+                    if(target.memory > 30) {
+                        return "red";
+                    }
+
+                    return 1;
+                }
+            },
+            style: {
+                backgroundColor: "transparent"
+            },
+            render : false
+        });
+
+        setInterval(function() {
+        	var delArray = [];
+            var end = new Date(),
+            resultTime = new Date(result),
+                start = new Date() - 1000 * 60 * 5,
+                domain = [ start, end ];
+			
+		    for(var i = 0; i < data1.length; i++) {
+		        if(data1[i].time.getTime() < start) {
+		        	delArray.push(i); 
+		        }
+		    }
+            
+		    for(var j = 0; j< delArray.length; j++){
+		    	data1.splice(delArray[j], 1);
+		    }
+            data1.push({
+            	elapseTime: elapse,
+                time: resultTime,
+                id : id
+            });
+          
+            result = null;
+			elapse = null;
+            chart_builder[0].axis(0).updateGrid("x", { domain : domain });
+            chart_builder[0].axis(0).update(data1);
+            chart_builder[0].render();
+			
+            data2.shift();
+            data2.push({
+                cpu: cpuShare
+            });
+
+            chart_builder[1].axis(0).updateGrid("x", { domain : domain });
+            chart_builder[1].axis(0).update(data2);
+            chart_builder[1].render();
+            
+            data3.shift();
+            data3.push({
+                memory: memoryShare
+            });
+
+            chart_builder[2].axis(0).updateGrid("x", { domain : domain });
+            chart_builder[2].axis(0).update(data3);
+            chart_builder[2].render();
+        }, 1000);
+        
+        $(document).on('keydown', function(e){
+           
+        	if(e.which==38)
+   			{
+        		if(delta <= 240){
+        			delta+=60;
+        		}
+   			}else if(e.which==40){
+   				if(delta >= 120){
+   					delta-=60;
+   				}
+   			}
+            domain = [0, delta];
+            chart_builder[0].axis(0).updateGrid("y", { domain : domain });
+   	});
+    });
+ 
+    function changeTheme(theme) {
+        $("#ui_theme").attr("href", "/js/lib/jui/css/ui-" + theme + ".min.css");
+        $("#grid_theme").attr("href", "/js/lib/jui/css/grid-" + theme + ".min.css");
+        $("#index_theme").attr("href", "/js/gallery/admintool/index-" + theme + ".css");
+
+        for(var i = 0, len = chart_list.length; i < len; i++) {
+
+            if (chart_list[i].setTheme) {
+                chart_list[i].setTheme(theme);
+            } else {
+                chart_list[i].chart.setTheme(theme);
+            }
+        }
+
+        for(var j = 0, len2 = chart_builder.length; j <len2; j++){
+            if(chart_builder[j].setTheme) {
+                chart_builder[j].setTheme(theme);
+            }else{
+                chart_builder[j].builder.setTheme(theme);
+            }
+        }
+    }
+        $(document).ready(function() {
+            var messageList = $("#result");
+            var socket = new SockJS('/stomp');
+            var stompClient = Stomp.over(socket);
+
+            stompClient.connect({ }, function(frame) {
+                //cpu 점유율
+                stompClient.subscribe("/topic/cpu", function(data) {
+                    var message = JSON.parse(data.body);
+                    cpuShare=message.cpu;
+                });
+                //memory 점유율
+                stompClient.subscribe("/topic/mem", function(data) {
+                    var message = JSON.parse(data.body);
+                    memoryShare=message.mem;
+                });
+                //요청건수
+                stompClient.subscribe("/topic/reqCnt", function(data) {
+                    var message = JSON.parse(data.body);
+                    reqCnt = message.cnt;
+                    document.all('request').innerHTML=reqCnt;
+                    document.all('process').innerHTML=reqCnt-resCnt;
+                    
+                });
+              	//응답건수
+                stompClient.subscribe("/topic/resCnt", function(data) {
+                    var message = JSON.parse(data.body);
+                    resCnt = message.cnt;
+                    document.all('response').innerHTML=resCnt;
+                    document.all('process').innerHTML=reqCnt-resCnt;
+                });
+              //socketView
+                stompClient.subscribe("/topic/CV_RES_VAL", function(data) {
+                    var message = JSON.parse(data.body);
+                    elapse = message.elapseTime;
+                   	result = message.time;
+                   	id	= message.id;
+                });
+              
+            });
+            
+        });
+    </script>
+</body>
+</html>

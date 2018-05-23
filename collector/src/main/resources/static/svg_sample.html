@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>svg sample</title>
+</head>
+<script
+        src="https://code.jquery.com/jquery-3.3.1.slim.js"
+        integrity="sha256-fNXJFIlca05BIO2Y5zh1xrShK3ME+/lYZ0j+ChxX2DA="
+        crossorigin="anonymous"></script>
+
+<script>
+    var _timer = 0;
+    var _index_circle = 0;
+
+    $(document).ready(function(){
+
+
+
+
+
+
+
+
+
+
+        var _circle_color = ["orange", "red","yellow", "gray", "pink"];
+
+
+        $("button").click(function(){
+            _index_circle ++;
+
+            var _circle = addTx('circle', {cx: 10 * _index_circle, cy:50, r:10, fill: _circle_color[_index_circle+5/5], id: _index_circle+'A' });
+
+
+
+            //var _animate = addTx('animate', {'xlink:href': '#'+_index_circle, attributeName: 'cx', from:'50', to:'100%', dur: '1s', begin: '0', fill:'freeze' });
+
+            // _circle.animate({
+            //  'xlink:href':'#'+_index_circle,
+            //   attributeName: 'cx',
+            //   from : '50',
+            //   to : '100%',
+            //   dur : '1s',
+            //   begin : '0',
+            //   fill : 'freeze'
+            // });
+
+// var ani = document.createElementNS("http://www.w3.org/2000/svg","animateTransform");
+//     ani.setAttribute("attributeName", "transform");
+//     ani.setAttribute("attributeType", "xml");
+//     ani.setAttribute("type", "translate" );
+//     ani.setAttribute("from", "10");
+//     ani.setAttribute("to", "1000");
+//     ani.setAttribute("begin", "0s");
+//     ani.setAttribute("dur", "2s");
+//     ani.setAttribute("fill", "freeze");
+//     _circle.appendChild(ani);
+            // ani.beginElement();
+            //ani.animate();
+            var ani = document.createElementNS("http://www.w3.org/2000/svg","animate");
+            ani.setAttribute("attributeName", "cx");
+            ani.setAttribute("xlink:href", '#'+_index_circle+'A');
+            ani.setAttribute("from", "50px");
+            ani.setAttribute("to", "100%");
+            ani.setAttribute("begin", "0s");
+            ani.setAttribute("dur", "3s");
+            ani.setAttribute("fill", "freeze");
+            ani.setAttribute("additive", "replace");
+
+
+           // _circle.appendChild(ani);
+
+            document.getElementById('txActionBar').appendChild(_circle);
+            //document.getElementById('txActionBar').appendChild(ani);
+
+            _circle.onmousedown = function() {
+                alert(_circle.id);
+            };
+            animate(_index_circle+'A');
+            //animation add
+            //setInterval(animate(), 20);
+
+        });
+    });
+
+    function addTx(tag, attrs) {
+        var el= document.createElementNS('http://www.w3.org/2000/svg', tag);
+        for (var k in attrs)
+            el.setAttribute(k, attrs[k]);
+
+        return el;
+    }
+
+    function animate(txid){
+
+        $("#"+txid). =txid;
+    }
+
+
+
+
+
+</script>
+<body>
+
+<svg id="txActionBar" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"  width="100%" height="100">
+    <circle id="0" r="10" cx="50" cy="50" fill="red"  />
+    <animate xlink:title="1111"
+            xlink:href="#0"
+            attributeName="cx"
+            from="50px"
+            to="100%"
+            dur="4s"
+            begin="0s"
+            fill="freeze" additive="replace"
+    />
+    <rect height="10" width="10" stroke-width="2" fill="red" aria-busy="true">
+        <animate attributeType="CSS" attributeName="opacity"
+                 from="1" to="0" dur="5s" repeatCount="indefinite" />
+    </rect>
+</svg>
+<button > add </button>
+</body>
+</html>

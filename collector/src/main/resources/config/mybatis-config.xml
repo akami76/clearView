@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="logImpl" value="SLF4J"/>                        <!-- default: not set (SLF4J|LOG4J|LOG4J2|JDK_LOGGING|COMMONS_LOGGING|STDOUT_LOGGING|NO_LOGGING) -->
+
+        <setting name="cacheEnabled" value="false" />                  <!-- default: true -->
+
+        <setting name="multipleResultSetsEnabled" value="true" />      <!-- default: true -->
+        <setting name="useColumnLabel" value="true" />                 <!-- default: true -->
+        <setting name="useGeneratedKeys" value="false" />              <!-- default: false -->
+        <setting name="defaultExecutorType" value="REUSE" />           <!-- default: SIMPLE (SIMPLE|REUSE|BATCH) -->
+        <setting name="defaultStatementTimeout" value="600" />         <!-- default: not set -->
+        <setting name="safeRowBoundsEnabled" value="false" />          <!-- default: false -->
+        <setting name="mapUnderscoreToCamelCase" value="true" />       <!-- default: false -->
+        <setting name="localCacheScope" value="SESSION" />             <!-- default: SESSION (SESSION|STATEMENT) -->
+        <setting name="jdbcTypeForNull" value="OTHER" />               <!-- default: OTHER (NULL|VARCHAR|OTHER) -->
+
+        <setting name="lazyLoadingEnabled" value="true" />
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+    </settings>
+</configuration>

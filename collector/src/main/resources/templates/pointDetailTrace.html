@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear View DashBoard</title>
+    <script type="text/javascript"
+            src="//cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+    <script type="text/javascript"
+            src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="/js/lib/jui/css/ui.min.css"/>
+    <link id="ui_theme" rel="stylesheet"
+          href="/js/lib/jui/css/ui-jennifer.min.css"/>
+    <link rel="stylesheet" href="/js/lib/jui/css/grid.min.css"/>
+    <link id="grid_theme" rel="stylesheet"
+          href="/js/lib/jui/css/grid-jennifer.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.js"
+            integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg="
+            crossorigin="anonymous"></script>
+    <script src="/js/lib/jui/js/core.min.js"></script>
+    <script src="/js/lib/jui/js/ui.min.js"></script>
+    <script src="/js/lib/jui/js/grid.min.js"></script>
+    <script src="/js/lib/jui/js/chart.min.js"></script>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans"
+          rel="stylesheet" type="text/css">
+    <link href="/js/gallery/admintool/index.css" rel="stylesheet"
+          type="text/css"/>
+    <link id="index_theme" href="/js/gallery/admintool/index-jennifer.css"
+          rel="stylesheet" type="text/css"/>
+
+</head>
+
+<body class="jui">
+<div id="xtable_6" class="xtable scroll" style="margin-top: 7px;">
+    <table class="table classic">
+    <thead>
+    <tr>
+        <th style="display: none">cvReqId</th>
+        <th>Agent ID</th>
+        <th style="display: none">cvCookieId</th>
+        <th style="display: none">sessionId</th>
+        <th>Client IP</th>
+        <th>Elapse Time</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>URI</th>
+        <th>Status</th>
+        <th>method</th>
+        <th>userAgent</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr {{#pointMarkList}}>
+        <td style="display: none">{{cvReqId}}</td>
+        <td>{{cvAgentId}}</td>
+        <td style="display: none">{{cvCookieId}}</td>
+        <td style="display: none">{{sessionId}}</td>
+        <td>{{clientIp}}</td>
+        <td>{{cvElapseTime}} ms</td>
+        <td>{{cvReqStartTime}}</td>
+        <td>{{cvResEndTime}}</td>
+        <td>{{uri}}</td>
+        <td>{{status}}</td>
+        <td>{{method}}</td>
+        <td>{{userAgent}}</td>
+    </tr {{/pointMarkList}}>
+    </tbody>
+</table>
+</div>
+
+</body>
+</html>

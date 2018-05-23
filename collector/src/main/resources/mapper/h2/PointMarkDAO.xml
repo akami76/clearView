@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.akami.clearview.db.PointMarkDAO">
+
+    <select id="getPointMarkList" resultType="com.akami.clearview.domain.PointMark">
+        SELECT
+            REQ.CV_REQ_ID cvReqId
+            ,CV_AGENT_ID  cvAgentId
+            ,RES.CV_COOKIE_ID cvCookieId
+            ,SESSION_ID sessionId
+            ,CLIENTIP CLIENTIP
+            ,CV_ELAPSE_TIME cvElapseTime
+            ,CV_REQ_START_TIME   cvReqStartTime
+            ,CV_RES_END_TIME cvResEndTime
+            ,METHOD
+            ,URI uri
+            ,STATUS
+            ,RES.USER_AGENT userAgent
+        FROM
+            REQUEST_SET REQ,
+            RESPONSE_SET RES
+        WHERE REQ.CV_REQ_ID = RES.CV_REQ_ID
+              AND REQ.CV_REQ_ID IN
+        <foreach item="CV_REQ_ID" index="index" collection="array" open="(" separator="," close=")">
+            #{CV_REQ_ID}
+        </foreach>
+    </select>
+
+
+</mapper>

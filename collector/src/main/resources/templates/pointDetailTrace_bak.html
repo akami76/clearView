@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear View DashBoard</title>
+    <script type="text/javascript"
+            src="//cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+    <script type="text/javascript"
+            src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="/js/lib/jui/css/ui.min.css"/>
+    <link id="ui_theme" rel="stylesheet"
+          href="/js/lib/jui/css/ui-jennifer.min.css"/>
+    <link rel="stylesheet" href="/js/lib/jui/css/grid.min.css"/>
+    <link id="grid_theme" rel="stylesheet"
+          href="/js/lib/jui/css/grid-jennifer.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.js"
+            integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg="
+            crossorigin="anonymous"></script>
+    <script src="/js/lib/jui/js/core.min.js"></script>
+    <script src="/js/lib/jui/js/ui.min.js"></script>
+    <script src="/js/lib/jui/js/grid.min.js"></script>
+    <script src="/js/lib/jui/js/chart.min.js"></script>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans"
+          rel="stylesheet" type="text/css">
+    <link href="/js/gallery/admintool/index.css" rel="stylesheet"
+          type="text/css"/>
+    <link id="index_theme" href="/js/gallery/admintool/index-jennifer.css"
+          rel="stylesheet" type="text/css"/>
+
+</head>
+
+<body class="jui">
+<a id="table_15_btn" download="table.csv" class="btn small">
+    <i class="icon-play"></i> Run
+</a>
+
+<table id="pointMarkListGrid" class="table simple headline" style="margin-top: 7px;">
+    <thead>
+    <tr>
+        <th>cvReqId</th>
+        <th>cvAgentId</th>
+        <th>cvCookieId</th>
+        <th>sessionId</th>
+        <th>clientIp</th>
+        <th>cvElapseTime</th>
+        <th>cvReqStartTime</th>
+        <th>cvReqEndTime</th>
+        <th>url</th>
+        <th>status</th>
+        <th>method</th>
+        <th>userAgent</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script data-jui="#pointMarkListGrid" data-tpl="row" type="text/template">
+    <tr>
+        <td><!= name !></td>
+        <td><!= age !></td>
+        <td><!= location !></td>
+    </tr>
+</script>
+
+<script>
+
+   /*<th>cvReqId</th>
+    <th>cvAgentId</th>
+    <th>cvCookieId</th>
+    <th>sessionId</th>
+    <th>clientIp</th>
+    <th>cvElapseTime</th>
+    <th>cvReqStartTime</th>
+    <th>cvReqEndTime</th>
+    <th>url</th>
+    <th>status</th>
+    <th>method</th>
+    <th>userAgent</th>*/
+    jui.ready([ "grid.table" ], function(table) {
+        table_15 = table("#pointMarkListGrid", {
+            fields: [ "cvReqId", "cvAgentId", "cvCookieId", "sessionId", "clientIp", "cvElapseTime", "cvReqStartTime", "cvResEndTime", "uri", "status", "method","userAgent" ],
+            csv: [ "cvReqId", "cvAgentId", "cvCookieId", "sessionId", "clientIp", "cvElapseTime", "cvReqStartTime", "cvResEndTime", "uri", "status", "method","userAgent"  ],
+            csvNames: [ "cvReqId", "cvAgentId", "cvCookieId", "sessionId", "clientIp", "cvElapseTime", "cvReqStartTime", "cvResEndTime", "uri", "status", "method","userAgent"  ],
+            data: [
+                    // { name: "2223", age: "20", location: "Ilsan" },
+                {{#pointMarkList}}
+                        { cvReqId: "{{cvReqId}}", cvAgentId: "{{cvAgentId}}", cvCookieId: "{{cvCookieId}}", sessionId: "{{sessionId}}" , clientIp: "{{clientIp}}" , cvElapseTime: "{{cvElapseTime}}" , cvReqStartTime: "{{cvElapseTime}}" , cvResEndTime: "{{cvResEndTime}}" , uri: "{{uri}}" , status: "{{status}}" , method: "{{method}}" , userAgent: "{{userAgent}}" }
+        {{.}}
+                {{/pointMarkList}}
+            ],
+            resize: true,
+            sort: true,
+            event: {
+                sort: function(column, e) {
+                    $("#table_15_btn").attr("href", this.getCsvBase64());
+                }
+            }
+        });
+
+        $("#table_15_btn").attr("href", table_15.getCsvBase64());
+    });
+</script>
+</body>
+</html>
