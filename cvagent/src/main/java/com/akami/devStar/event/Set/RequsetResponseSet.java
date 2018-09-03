@@ -15,7 +15,8 @@ public class RequsetResponseSet {
     ClassPool child = null;
 
 
-    public byte[] transformClass( Class classToTransform, byte[] b) {
+    //Request & Response 수집
+    public byte[] transformClass(Class classToTransform, byte[] b) {
         CtClass cl = null;
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -23,22 +24,16 @@ public class RequsetResponseSet {
             ClassPool pool = ClassPool.getDefault();
             pool.insertClassPath(new LoaderClassPath(classLoader));
             child = new ClassPool(pool);
-            try {
-                child.insertClassPath("./classes");
-                child.appendSystemPath();
-                child.childFirstLookup = true;
 
-
-
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-            }
+            child.insertClassPath("./classes");
+            child.appendSystemPath();
+            child.childFirstLookup = true;
 
             if (child != null) {
                 cl = child.makeClass(new java.io.ByteArrayInputStream(b));
                 //CtMethod[] methods = cl.getMethods();
 
-                System.out.println("CI : "+cl.getName());
+                System.out.println("CI : " + cl.getName());
                 //ThreadUtil.getThreadDetail(Thread.currentThread().getId());
                 if (cl.isInterface() == false) {
                     CtBehavior[] methods = cl.getDeclaredBehaviors();
@@ -46,7 +41,7 @@ public class RequsetResponseSet {
                         System.out.println("RequsetResponseSet methods[" + i + "]: " + methods[i].getLongName());
                         if (methods[i].isEmpty() == false) {
                             System.out.println(methods[i].getLongName());
-                            doTransform( methods[i]);
+                            doTransform(methods[i]);
 
 
                             /*System.out.println("72 line====>>>> ");
@@ -63,6 +58,8 @@ public class RequsetResponseSet {
                 }
                 b = cl.toBytecode();
             }
+
+
         } catch (Exception e) {
             System.out.println("e50: " + e);
         } finally {
@@ -72,7 +69,8 @@ public class RequsetResponseSet {
         }
         return b;
     }
-    public byte[] securityDetact( Class classToTransform, byte[] b) {
+
+    public byte[] securityDetact(Class classToTransform, byte[] b) {
         CtClass cl = null;
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -86,7 +84,6 @@ public class RequsetResponseSet {
                 child.childFirstLookup = true;
 
 
-
             } catch (NotFoundException e) {
                 e.printStackTrace();
             }
@@ -95,22 +92,21 @@ public class RequsetResponseSet {
                 cl = child.makeClass(new java.io.ByteArrayInputStream(b));
                 //CtMethod[] methods = cl.getMethods();
 
-                System.out.println("CI : "+cl.getName());
+                System.out.println("CI : " + cl.getName());
                 if (cl.isInterface() == false) {
                     CtBehavior[] methods = cl.getDeclaredBehaviors();
                     for (int i = 0; i < methods.length; i++) {
-                        if(!methods[i].isEmpty()) {
+                        if (!methods[i].isEmpty()) {
                             System.out.println(":::>>> " + methods[i].getLongName());
                             if (methods[i].getLongName().contains("org.apache.jasper.runtime.HttpJspBase.service")) {
                                 methods[i].insertBefore("System.out.println(\"=start=============\");" +
-                                        "System.out.println($1);" );
+                                        "System.out.println($1);");
 
 
                                 methods[i].insertAfter("System.out.println(\"=after=============\");" +
                                         "System.out.println($1);");
                             }
                         }
-
 
 
                     }
@@ -126,8 +122,6 @@ public class RequsetResponseSet {
         }
         return b;
     }
-
-
 
 
     public byte[] transformClass4Http(Class classToTransform, byte[] b) {
@@ -164,29 +158,29 @@ public class RequsetResponseSet {
                                     methods[i].addLocalVariable("__tid", CtClass.longType);
 
                                     sbs = new StringBuilder();
-                                    sbs.append( "__elapsedTime = System.currentTimeMillis();       "        )
-                                            .append("   __tid  = Thread.currentThread().getId();      "     )
-                                            .append(" if(Thread.currentThread().getName().length() < 10 ){ "    )
-                                            .append("      Thread.currentThread().setName(System.nanoTime()+\"_\"+Thread.currentThread().getId());"           )
+                                    sbs.append("__elapsedTime = System.currentTimeMillis();       ")
+                                            .append("   __tid  = Thread.currentThread().getId();      ")
+                                            .append(" if(Thread.currentThread().getName().length() < 10 ){ ")
+                                            .append("      Thread.currentThread().setName(System.nanoTime()+\"_\"+Thread.currentThread().getId());")
                                             .append(" } ");
 
                                     methods[i].insertBefore(sbs.toString());
 
 
                                     //TODO jsp 변환 시점에 개인정보가 있으면 별도 처리 한다.
-                                    if(methods[i].getLongName().contains("_jspService(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)")){
+                                    if (methods[i].getLongName().contains("_jspService(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)")) {
 
                                         String methodLongName = methods[i].getLongName();
                                         sbs = new StringBuilder();
-                                        sbs.append( "java.text.SimpleDateFormat __timeFormat = new java.text.SimpleDateFormat(\"yyyy/MM/dd HH:mm:ss.SSS\");" )
-                                                .append("String __elapsedTimeStr = __timeFormat.format(new java.util.Date(__elapsedTime));"                  )
-                                                .append("org.json.JSONObject callTraceJson = new org.json.JSONObject();"                                     )
-                                                .append("String _cv_agent_id = java.lang.System.getProperty(\"clearview.id\");"                              )
+                                        sbs.append("java.text.SimpleDateFormat __timeFormat = new java.text.SimpleDateFormat(\"yyyy/MM/dd HH:mm:ss.SSS\");")
+                                                .append("String __elapsedTimeStr = __timeFormat.format(new java.util.Date(__elapsedTime));")
+                                                .append("org.json.JSONObject callTraceJson = new org.json.JSONObject();")
+                                                .append("String _cv_agent_id = java.lang.System.getProperty(\"clearview.id\");")
                                                 //.append("String methodLongName =\"").append(methodLongName).append("\" ;"                                  )
-                                                .append("callTraceJson.put(\"cv_agent_id\", _cv_agent_id );"                                                 )
-                                                .append("callTraceJson.put(\"thread_id\",  __tid);"                                                          )
-                                                .append("callTraceJson.put(\"elapsedTimeStr\", __elapsedTimeStr);"                                           )
-                                                .append("callTraceJson.put(\"methodLongName\", \""+methodLongName +"\");"                                    )
+                                                .append("callTraceJson.put(\"cv_agent_id\", _cv_agent_id );")
+                                                .append("callTraceJson.put(\"thread_id\",  __tid);")
+                                                .append("callTraceJson.put(\"elapsedTimeStr\", __elapsedTimeStr);")
+                                                .append("callTraceJson.put(\"methodLongName\", \"" + methodLongName + "\");")
                                                 .append("com.akami.jmsclient.Producer callTraceSender = com.akami.jmsclient.ProducerManager.PRODUCER_MANAGER_POOL[com.akami.com.TOPIC.CV_CALL_TREE.getIndex()];")
                                                 .append("System.out.println(\"  ● callTraceJson.toString() :\"+callTraceJson.toString());")
                                                 .append("callTraceSender.produceMessage(callTraceJson.toString());");
@@ -203,18 +197,18 @@ public class RequsetResponseSet {
                                         );
 
                                        */
-                                    }else{
+                                    } else {
                                         String methodLongName = methods[i].getLongName();
                                         sbs = new StringBuilder();
-                                        sbs.append( "java.text.SimpleDateFormat __timeFormat = new java.text.SimpleDateFormat(\"yyyy/MM/dd HH:mm:ss.SSS\");" )
-                                                .append("String __elapsedTimeStr = __timeFormat.format(new java.util.Date(__elapsedTime));"                  )
-                                                .append("org.json.JSONObject callTraceJson = new org.json.JSONObject();"                                     )
-                                                .append("String _cv_agent_id = java.lang.System.getProperty(\"clearview.id\");"                              )
+                                        sbs.append("java.text.SimpleDateFormat __timeFormat = new java.text.SimpleDateFormat(\"yyyy/MM/dd HH:mm:ss.SSS\");")
+                                                .append("String __elapsedTimeStr = __timeFormat.format(new java.util.Date(__elapsedTime));")
+                                                .append("org.json.JSONObject callTraceJson = new org.json.JSONObject();")
+                                                .append("String _cv_agent_id = java.lang.System.getProperty(\"clearview.id\");")
                                                 //.append("String methodLongName =\"").append(methodLongName).append("\" ;"                                  )
-                                                .append("callTraceJson.put(\"cv_agent_id\", _cv_agent_id );"                                                 )
-                                                .append("callTraceJson.put(\"thread_nm\",  Thread.currentThread().getName());"                                                          )
-                                                .append("callTraceJson.put(\"elapsedTimeStr\", __elapsedTimeStr);"                                           )
-                                                .append("callTraceJson.put(\"methodLongName\", \""+methodLongName +"\");"                                    )
+                                                .append("callTraceJson.put(\"cv_agent_id\", _cv_agent_id );")
+                                                .append("callTraceJson.put(\"thread_nm\",  Thread.currentThread().getName());")
+                                                .append("callTraceJson.put(\"elapsedTimeStr\", __elapsedTimeStr);")
+                                                .append("callTraceJson.put(\"methodLongName\", \"" + methodLongName + "\");")
                                                 .append("com.akami.jmsclient.Producer callTraceSender = com.akami.jmsclient.ProducerManager.PRODUCER_MANAGER_POOL[com.akami.com.TOPIC.CV_CALL_TREE.getIndex()];")
                                                 .append("System.out.println(\"  ● callTraceJson.toString() :\"+callTraceJson.toString());")
                                                 .append("callTraceSender.produceMessage(callTraceJson.toString());");
@@ -308,7 +302,7 @@ public class RequsetResponseSet {
         return b;
     }*/
 
-    private void doTransform( CtBehavior method) throws NotFoundException, CannotCompileException, JMSException {
+    private void doTransform(CtBehavior method) throws NotFoundException, CannotCompileException, JMSException {
         System.out.println("****************RequsetResponseSet : 58:" + method.getLongName());
         //org.apache.catalina.core.StandardEngineValve.invoke(org.apache.catalina.connector.Request,org.apache.catalina.connector.Response)
         try {

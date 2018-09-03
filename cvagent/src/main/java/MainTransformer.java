@@ -60,7 +60,7 @@ public class MainTransformer implements ClassFileTransformer {
             b = reqResSet.transformClass(redefiningClass, bytes);
         }
 
-        // JspWriter
+        // jsp 내의  개인정보를 찾아낸다.
         if(className.contains("HttpJspBase")){
             System.out.println("HttpJspBase===================================");
             b = reqResSet.securityDetact(redefiningClass, bytes);

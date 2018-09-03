@@ -68,6 +68,18 @@ public class SimpleController {
 		model.addAttribute("list",service.getList());
 		//javax.servlet.http.HttpServlet
 	}
+
+	@RequestMapping(value = "helloMysql2", method = RequestMethod.GET)
+	public void  helloMysql2(Model model) throws Exception{
+		//com.Hello h = new Hello();
+		logger.info("helloMysql...................");
+		logger.info("helloMysql..................."+service.getList());
+		logger.info("say()...................");
+		Thread.sleep(1000);
+		//h.say();
+		model.addAttribute("list",service.getList());
+		//javax.servlet.http.HttpServlet
+	}
 	
 	@RequestMapping(value = "echoQue", method = RequestMethod.GET)
 	public void  echoQue(Model model) throws Exception{
